@@ -1,0 +1,7 @@
+client.py
+socialsink.egg-info/PKG-INFO
+socialsink.egg-info/SOURCES.txt
+socialsink.egg-info/dependency_links.txt
+socialsink.egg-info/entry_points.txt
+socialsink.egg-info/requires.txt
+socialsink.egg-info/top_level.txt
