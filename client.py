@@ -21,8 +21,8 @@ def add_file_to_tracked(filename):
     filedict["checksum"]=calculate_checksum(filename)
     filedict["filepath"] = filename
     filedict["timestamp"] = time.time()
-    with open(".trackedfiles.json","a+") as fileout:
-        json.dumps({"filename":filedict})
+    with open(".trackedfiles.json","r") as filein:
+        json.load()
     return
 
 
