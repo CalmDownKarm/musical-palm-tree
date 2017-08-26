@@ -5,6 +5,25 @@ import click
 from os import listdir
 from os.path import isfile, join
 import json
+import time
+import pickle
+import hashlib
+
+
+def calculate_checksum(filename):
+    """ Uses Hashlib library to create a checksum """
+
+    return 1
+
+def add_file_to_tracked(filename):
+    """ Helper function"""
+    filedict = {}
+    filedict["checksum"]=calculate_checksum(filename)
+    filedict["filepath"] = filename
+    filedict["timestamp"] = time.time()
+    with open(".trackedfiles.json","a+") as fileout:
+        json.dumps({"filename":filedict})
+    return
 
 
 @click.command()
@@ -15,6 +34,7 @@ def add(filepath,isdirectory):
     if isdirectory:
         onlyfiles = [f for f in listdir(filepath) if isfile(join(filepath, f))]
         click.echo(onlyfiles)
+        map(add_file_to_tracked,onlyfiles)
     else:
         click.echo("Add a single file")
     return
