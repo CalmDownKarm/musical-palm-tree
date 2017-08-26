@@ -2,12 +2,15 @@ from setuptools import setup
 setup(
     name="socialsink",
     version='0.1',
-    py_modules=['client'],
+    py_modules=['client','pickle','dataset'],
     install_requires=[
-        'Click','os','json','pickle','time','hashlib'
+        'Click'
     ],
     entry_points='''
         [console_scripts]
-        socialsink=client:add
+        soc_add=client:add
+        soc_pull=client:pull
+        soc_push=client:push
+
     ''',
 )

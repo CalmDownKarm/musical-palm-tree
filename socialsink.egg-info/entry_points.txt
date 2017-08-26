@@ -1,4 +1,7 @@
 
         [console_scripts]
-        socialsink=client:add
+        soc_add=client:add
+        soc_pull=client:pull
+        soc_push=client:push
+
     
