@@ -1,6 +1,9 @@
-from flask import Flask
+import dataset
+import json
+from flask import Flask,jsonify
 
-app =Flask(__name__)
+
+app = Flask(__name__)
 
 @app.route("/")
 def hello():
@@ -14,7 +17,7 @@ def track_files():
     # for val in content['results']:
 
     #     # table.insert(val)
-    return    
+    return "<h1 style='color:blue'>Hello There!</h1>"
 
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
@@ -25,3 +28,5 @@ def returntablecontents():
         json_data = json.load(file)
     return jsonify(json_data)
     
+if __name__ == '__main__':
+    app.run(debug=True)

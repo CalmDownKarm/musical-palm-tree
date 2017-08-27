@@ -22,6 +22,19 @@ def calculate_checksum(filename):
         hasher.update(buf)
     return hasher.hexdigest()
 
+def create_dict(filename):
+    """ Creates a dict for each file """
+    (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filename)
+    filedict = {}
+    filedict["size"] = size
+    filedict["accesstime"] = atime 
+    filedict["modtime"] = mtime
+    filedict["Ctime"] = ctime
+    filedict["checksum"]=calculate_checksum(filename)
+    filedict["filepath"] = filename
+    filedict["timestamp"] = time.time()
+    return filedict
+
 def add_file_to_tracked(filename):
     """ Helper function to add files to the sqlite db """
     db = dataset.connect('sqlite:///mydatabase.db')
@@ -29,15 +42,7 @@ def add_file_to_tracked(filename):
     check = table.find_one(filepath=filename)
     if not check:
         try:
-            (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filename)
-            filedict = {}
-            filedict["size"] = size
-            filedict["accesstime"] = atime 
-            filedict["modtime"] = mtime
-            filedict["Ctime"] = ctime
-            filedict["checksum"]=calculate_checksum(filename)
-            filedict["filepath"] = filename
-            filedict["timestamp"] = time.time()
+            filedict = create_dict(filename)            
             pprint.pprint(filedict)
         except IOError:
             print "Error in getting file stats"
@@ -61,8 +66,18 @@ def add(filepath,isdirectory):
         add_file_to_tracked(filepath)
         click.echo("Add a single file")
     return
+
+@click.command()
 def pull():
     """ Sync your local working directory with remote server directory """
+    # send a get request to my server and get a list of files
+    serverurl = "http://localhost:5000/v1/replytopull"
+    try: 
+        r = requests.get(serverurl)
+        filedata = r.json()
+        filedata['results']
+    except:
+        pass
     return
 
 @click.command()
