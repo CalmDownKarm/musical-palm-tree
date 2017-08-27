@@ -4,7 +4,7 @@ setup(
     version='0.1',
     py_modules=['client','pickle','dataset'],
     install_requires=[
-        'Click'
+        'Click','paramiko'
     ],
     entry_points='''
         [console_scripts]

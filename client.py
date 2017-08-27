@@ -11,18 +11,22 @@ import pickle
 import hashlib
 import dataset
 import pprint
-
+import requests
+import paramiko
 
 def calculate_checksum(filename):
     """ Uses Hashlib library to create a checksum """
-
-    return 1
+    hasher = hashlib.md5()
+    with open(filename,'rb') as afile:
+        buf = afile.read()
+        hasher.update(buf)
+    return hasher.hexdigest()
 
 def add_file_to_tracked(filename):
-    """ Helper function"""
+    """ Helper function to add files to the sqlite db """
     db = dataset.connect('sqlite:///mydatabase.db')
     table = db['files']
-    check = table.find(filepath=filename)
+    check = table.find_one(filepath=filename)
     if not check:
         try:
             (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filename)
@@ -46,9 +50,9 @@ def add_file_to_tracked(filename):
 
 @click.command()
 @click.argument('filepath')
-@click.option('--isdirectory','-id',is_flag=True,help = "Adds a directory or filename",default=False)
+@click.option('--isdirectory','-id',is_flag=True,help = "Flag denoting whether directory path",default=False)
 def add(filepath,isdirectory):
-    """Point a file, it should be tracked. Folders should be tracked recursively """
+    """Point a file, it should be tracked. Point to a directory with the id flag and all files in the directory get added"""
     if isdirectory:
         onlyfiles = [f for f in os.listdir(filepath) if isfile(join(filepath, f))]
         click.echo(onlyfiles)
@@ -60,7 +64,26 @@ def add(filepath,isdirectory):
 def pull():
     """ Sync your local working directory with remote server directory """
     return
+
 @click.command()
 def push():
     """ Sync yout local directory with server """
-    # start by retrieving a list
+    # start by retrieving a list of all files
+    db = dataset.connect('sqlite:///mydatabase.db')
+    result = db['files'].all()
+    # Hash all my files and check again
+    
+    dataset.freeze(result,format='json',filename='files.json')
+    # send files.json to server. 
+    with open("files.json",'rb') as file:
+        json_data = json.load(file)
+    # try:
+    #     headers = { 'application/json' }
+    #     r = requests.put('http://139.59.90.147/v1/sendfilelist',json = json_data,headers=headers)
+    # except Exception as e:
+    #     click.echo(e)
+    # finally:
+    for foo in db['files']:
+        print(foo['filepath'])
+    
+    # begin to scp all the files using paramiko
