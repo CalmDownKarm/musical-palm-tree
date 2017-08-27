@@ -54,7 +54,7 @@ def add_file_to_tracked(filename):
 def add(filepath,isdirectory):
     """Point a file, it should be tracked. Point to a directory with the id flag and all files in the directory get added"""
     if isdirectory:
-        onlyfiles = [f for f in os.listdir(filepath) if isfile(join(filepath, f))]
+        onlyfiles = [join(filepath, f) for f in os.listdir(filepath) if isfile(join(filepath, f))]
         click.echo(onlyfiles)
         map(add_file_to_tracked,onlyfiles)
     else:
@@ -72,7 +72,7 @@ def push():
     db = dataset.connect('sqlite:///mydatabase.db')
     result = db['files'].all()
     # Hash all my files and check again
-    
+
     dataset.freeze(result,format='json',filename='files.json')
     # send files.json to server. 
     with open("files.json",'rb') as file:

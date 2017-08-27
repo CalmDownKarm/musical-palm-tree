@@ -8,13 +8,20 @@ def hello():
 
 @app.route('/v1/sendfilelist', methods=['POST'])
 def track_files():
-    content = request.get_json(silent=True)
-    db = dataset.connect('sqlite:///serverdb.db')
-    table = db['files']
-    for val in content['results']:
+    # content = request.get_json(silent=True)
+    # db = dataset.connect('sqlite:///serverdb.db')
+    # table = db['files']
+    # for val in content['results']:
 
-        # table.insert(val)
-        
+    #     # table.insert(val)
+    return    
 
 @app.route('/v1/replytopull',methods = ['GET'])
-def returntablecontents
+def returntablecontents():
+    db = dataset.connect('sqlite:///serverdb.db')
+    result = db['files'].all()
+    dataset.freeze(result,format='json',filename='files.json')
+    with open("files.json",'rb') as file:
+        json_data = json.load(file)
+    return jsonify(json_data)
+    
