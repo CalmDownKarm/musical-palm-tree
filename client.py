@@ -119,7 +119,7 @@ def push(force):
             table.insert(create_dict(filed['filepath']))
             flag = True
     db.commit()
-    if flag:
+    if flag or force:
         for filed in db['files']:
             f = filed['filepath']
             args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/",]
@@ -129,6 +129,7 @@ def push(force):
         dataset.freeze(result, format='json', filename='files.json')
         with open("files.json","rb") as filed:
             json_data = json.load(filed)
+            click.echo(json_data)
         try:    
             r = requests.put(serverurl,json=json_data)
         except Exception as e:

@@ -9,10 +9,9 @@ app = Flask(__name__)
 def hello():
     return "<h1 style='color:blue'>Hello There!</h1>"
 
-@app.route('/v1/sendfilelist', methods=['GET','POST'])
+@app.route('/v1/sendfilelist', methods=['POST'])
 def track_files():
     content = request.get_json(silent=False)
-    return jsonify(content)
     db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     for val in content['results']:
@@ -20,7 +19,7 @@ def track_files():
             table.delete(filepath = val['filepath'])
         table.insert(val)
     db.commit()
-    return 
+    return "Added"
 
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
@@ -29,7 +28,6 @@ def returntablecontents():
     for x in db['files']:
         data.append(x)
     # dataset.freeze(result,format='json',filename='files.json')
-    
     return jsonify(data)
     
 if __name__ == '__main__':
