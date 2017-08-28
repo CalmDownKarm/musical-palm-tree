@@ -24,11 +24,12 @@ def track_files():
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
     db = dataset.connect('sqlite:///serverdb.db')
+    data = []
     for x in db['files']:
-        print x
-    dataset.freeze(result,format='json',filename='files.json')
+        data.append(x)
+    # dataset.freeze(result,format='json',filename='files.json')
     
-    return jsonify(json_data)
+    return jsonify(data)
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)
