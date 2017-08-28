@@ -37,7 +37,7 @@ def create_dict(filename):
 
 def add_file_to_tracked(filename):
     """ Helper function to add files to the sqlite db """
-    db = dataset.connect('sqlite:///serverdb.db')
+    db = dataset.connect('sqlite:///mydatabase.db')
     table = db['files']
     check = table.find_one(filepath=filename)
     if not check:
@@ -69,17 +69,21 @@ def add(filepath,isdirectory):
 
 @click.command()
 def pull():
-    """ Sync your local working directory with remote server directory """
-    # send a get request to my server and get a list of files
+    """ Sync your local working directory with remote server directory WILL OVERWRITE ALL CHANGES TO FILES LOCALLY"""
     # serverurl = "http://localhost:5000/v1/replytopull"
     serverurl = "http://139.59.90.147:5000/v1/replytopull"
+    db = dataset.connect('sqlite:///mydatabase.db')
+    table = db['files']
     r = requests.get(serverurl)
     filedata = r.json()
     for filed in filedata['results']:
         f = filed['filepath']
-        args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,"tempfiles/"+f]
+        args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f]
         p = Popen(['rsync'] + args, shell=False)
         print p.wait()
+        table.delete(filepath=filed['filepath'])
+        table.insert(create_dict(filed['filepath']))
+    db.commit()
     return
 
 @click.command()
