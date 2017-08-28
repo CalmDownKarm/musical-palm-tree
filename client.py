@@ -76,11 +76,12 @@ def pull():
     try:
         r = requests.get(serverurl)
         filedata = r.json()
+        args = ["-avz","karm@139.59.90.147:/home/karm/datafiles/","Data/"]
+        p = Popen(['rsync'] + args, shell=False)
+        print p.wait()
         for filed in filedata:
             f = filed['filepath']
-            args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f,"--relative"]
-            p = Popen(['rsync'] + args, shell=False)
-            print p.wait()
+            click.echo(f)
             table.delete(filepath=filed['filepath'])
             table.insert(create_dict(filed['filepath']))
         db.commit()
@@ -88,7 +89,6 @@ def pull():
         print e
     finally:
         return
-
 def check_if_changed(filed):
     """ Helper to check if file has changed locally """
     filepath = filed['filepath']
