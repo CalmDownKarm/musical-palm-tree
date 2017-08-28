@@ -12,7 +12,7 @@ def hello():
 @app.route('/v1/sendfilelist', methods=['GET','POST'])
 def track_files():
     content = request.get_json(silent=False)
-    return jsonify()
+    return jsonify(content)
     db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     for val in content['results']:
