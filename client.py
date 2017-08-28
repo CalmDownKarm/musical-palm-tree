@@ -12,7 +12,7 @@ import hashlib
 import dataset
 import pprint
 import requests
-import paramiko
+from subprocess import Popen
 
 def calculate_checksum(filename):
     """ Uses Hashlib library to create a checksum """
@@ -37,7 +37,7 @@ def create_dict(filename):
 
 def add_file_to_tracked(filename):
     """ Helper function to add files to the sqlite db """
-    db = dataset.connect('sqlite:///mydatabase.db')
+    db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     check = table.find_one(filepath=filename)
     if not check:
@@ -71,21 +71,26 @@ def add(filepath,isdirectory):
 def pull():
     """ Sync your local working directory with remote server directory """
     # send a get request to my server and get a list of files
-    serverurl = "http://localhost:5000/v1/replytopull"
-    try: 
-        r = requests.get(serverurl)
-        filedata = r.json()
-        filedata['results']
-    except:
-        pass
+    # serverurl = "http://localhost:5000/v1/replytopull"
+    serverurl = "http://139.59.90.147:5000/v1/replytopull"
+    r = requests.get(serverurl)
+    filedata = r.json()
+    for filed in filedata['results']:
+        f = filed['filepath']
+        args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,"tempfiles/"+f]
+        p = Popen(['rsync'] + args, shell=False)
+        print p.wait()
     return
 
 @click.command()
-def push():
+def push(): ## DO SCP AND REPLACE
     """ Sync yout local directory with server """
     # start by retrieving a list of all files
     db = dataset.connect('sqlite:///mydatabase.db')
     result = db['files'].all()
+    
+
+
     # Hash all my files and check again
 
     dataset.freeze(result,format='json',filename='files.json')
