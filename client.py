@@ -1,13 +1,12 @@
 """Client side CLI Program
 3 basic tasks, similar to git add, git pull and git push
-In the backend, there's a Json File"""
+In the backend, there's a SQLiteDB"""
 
 import click
 import os
 from os.path import isfile, join
 import json
 import time
-import pickle
 import hashlib
 import dataset
 import pprint
@@ -74,40 +73,66 @@ def pull():
     serverurl = "http://139.59.90.147:5000/v1/replytopull"
     db = dataset.connect('sqlite:///mydatabase.db')
     table = db['files']
-    r = requests.get(serverurl)
-    filedata = r.json()
-    for filed in filedata['results']:
-        f = filed['filepath']
-        args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f]
-        p = Popen(['rsync'] + args, shell=False)
-        print p.wait()
-        table.delete(filepath=filed['filepath'])
-        table.insert(create_dict(filed['filepath']))
-    db.commit()
-    return
+    try:
+        r = requests.get(serverurl)
+        filedata = r.json()
+        for filed in filedata['results']:
+            f = filed['filepath']
+            args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f]
+            p = Popen(['rsync'] + args, shell=False)
+            print p.wait()
+            table.delete(filepath=filed['filepath'])
+            table.insert(create_dict(filed['filepath']))
+        db.commit()
+    except Exception as e:
+        print e
+    finally:
+        return
+
+def check_if_changed(filed):
+    """ Helper to check if file has changed locally """
+    filepath = filed['filepath']
+    (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filepath)
+    if mtime != filed['modtime'] or ctime != filed['Ctime'] or size != filed['size']:
+        if calculate_checksum(filepath)!=filed['checksum']:
+            return True
+        else:
+            return False
+    else:
+        return False
 
 @click.command()
-def push(): ## DO SCP AND REPLACE
-    """ Sync yout local directory with server """
-    # start by retrieving a list of all files
+def push(): 
+    serverurl = "http://139.59.90.147:5000/v1/sendfilelist"
+    """ Sync your local directory with server will always overwrite server"""
+    #1. check local head and see if there are any changes
+    #2. if yes, update filetable
+    #3  use rsync to transfer files themselves.
+    #4. Transmit updated filetable 
     db = dataset.connect('sqlite:///mydatabase.db')
-    result = db['files'].all()
+    table = db['files']
+    flag = False #Boolean flag to check if a push even needs to occur
+    for filed in db['files']:
+        if check_if_changed(filed):
+            table.delete(filepath=filed['filepath'])
+            table.insert(create_dict(filed['filepath']))
+            flag = True
+    db.commit()
+    if flag:
+        for filed in db['files']:
+            f = filed['filepath']
+            args = ["-avzpe","ssh -o StrictHostKeyChecking=no",f,"karm@139.59.90.147:/home/karm/datafiles/"+f]
+            p = Popen(['rsync'] + args, shell=False)
+            print p.wait()
+        result = db['files'].all()
+        dataset.freeze(result, format='json', filename='files.json')
+        with open("files.json","rb") as filed:
+            json_data = json.load(filed)
+        try:    
+            r = requests.put(serverurl,json=json_data)
+        except Exception as e:
+            print e
+    else:
+        click.echo("No files have been changed to push")
     
-
-
-    # Hash all my files and check again
-
-    dataset.freeze(result,format='json',filename='files.json')
-    # send files.json to server. 
-    with open("files.json",'rb') as file:
-        json_data = json.load(file)
-    # try:
-    #     headers = { 'application/json' }
-    #     r = requests.put('http://139.59.90.147/v1/sendfilelist',json = json_data,headers=headers)
-    # except Exception as e:
-    #     click.echo(e)
-    # finally:
-    for foo in db['files']:
-        print(foo['filepath'])
-    
-    # begin to scp all the files using paramiko
+    return

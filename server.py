@@ -11,13 +11,14 @@ def hello():
 
 @app.route('/v1/sendfilelist', methods=['POST'])
 def track_files():
-    # content = request.get_json(silent=True)
-    # db = dataset.connect('sqlite:///serverdb.db')
-    # table = db['files']
-    # for val in content['results']:
-
-    #     # table.insert(val)
-    return "<h1 style='color:blue'>Hello There!</h1>"
+    content = request.get_json(silent=True)
+    db = dataset.connect('sqlite:///serverdb.db')
+    table = db['files']
+    for val in content['results']:
+        table.delete(filepath = val['filepath'])
+        table.insert(val)
+    db.commit()
+    return 
 
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():

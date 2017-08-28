@@ -4,7 +4,7 @@ setup(
     version='0.1',
     py_modules=['client'],
     install_requires=[
-        'Click','paramiko','dataset'
+        'Click','dataset'
     ],
     entry_points='''
         [console_scripts]
