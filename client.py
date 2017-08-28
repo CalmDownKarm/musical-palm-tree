@@ -122,7 +122,7 @@ def push(force):
     if flag or force:
         for filed in db['files']:
             f = filed['filepath']
-            args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/",]
+            args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/","--relative"]
             p = Popen(['rsync'] + args, shell=False)
             print p.wait()
         result = db['files'].all()
@@ -131,7 +131,7 @@ def push(force):
             json_data = json.load(filed)
             click.echo(json_data)
         try:    
-            r = requests.put(serverurl,json=json_data)
+            r = requests.put(serverurl,json=json_data,headers={'Content-Type': 'application/json'})
         except Exception as e:
             print e
     else:

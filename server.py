@@ -1,7 +1,8 @@
 import dataset
 import json
+import sys
 from flask import Flask,jsonify
-
+from __future__ import print_function
 
 app = Flask(__name__)
 
@@ -12,6 +13,7 @@ def hello():
 @app.route('/v1/sendfilelist', methods=['POST'])
 def track_files():
     content = request.get_json(silent=False)
+    print(content, file=sys.stderr)
     db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     for val in content['results']:
@@ -19,7 +21,7 @@ def track_files():
             table.delete(filepath = val['filepath'])
         table.insert(val)
     db.commit()
-    return "Added"
+    return jsonify("Added")
 
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
@@ -27,7 +29,8 @@ def returntablecontents():
     data = []
     for x in db['files']:
         data.append(x)
-    # dataset.freeze(result,format='json',filename='files.json')
+    result = db['files'].all()
+    dataset.freeze(result,format='json',filename='files.json')
     return jsonify(data)
     
 if __name__ == '__main__':
