@@ -76,7 +76,7 @@ def pull():
     try:
         r = requests.get(serverurl)
         filedata = r.json()
-        for filed in filedata['results']:
+        for filed in filedata:
             f = filed['filepath']
             args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f]
             p = Popen(['rsync'] + args, shell=False)
