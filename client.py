@@ -102,7 +102,8 @@ def check_if_changed(filed):
         return False
 
 @click.command()
-def push(): 
+@click.option('--force','-f',is_flag=True,help = "Flag if present will force a push",default=False)
+def push(force): 
     serverurl = "http://139.59.90.147:5000/v1/sendfilelist"
     """ Sync your local directory with server will always overwrite server"""
     #1. check local head and see if there are any changes
@@ -113,7 +114,7 @@ def push():
     table = db['files']
     flag = False #Boolean flag to check if a push even needs to occur
     for filed in db['files']:
-        if check_if_changed(filed):
+        if check_if_changed(filed) or force:
             table.delete(filepath=filed['filepath'])
             table.insert(create_dict(filed['filepath']))
             flag = True
@@ -121,7 +122,7 @@ def push():
     if flag:
         for filed in db['files']:
             f = filed['filepath']
-            args = ["-avzpe","ssh -o StrictHostKeyChecking=no",f,"karm@139.59.90.147:/home/karm/datafiles/"+f]
+            args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/",]
             p = Popen(['rsync'] + args, shell=False)
             print p.wait()
         result = db['files'].all()

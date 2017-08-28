@@ -15,7 +15,8 @@ def track_files():
     db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     for val in content['results']:
-        table.delete(filepath = val['filepath'])
+        if table.find_one(filepath=val['filepath']):
+            table.delete(filepath = val['filepath'])
         table.insert(val)
     db.commit()
     return 
