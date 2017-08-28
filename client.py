@@ -78,7 +78,7 @@ def pull():
         filedata = r.json()
         for filed in filedata:
             f = filed['filepath']
-            args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f]
+            args = ["-avzpe","ssh -o StrictHostKeyChecking=no","karm@139.59.90.147:/home/karm/datafiles/"+f,f,"--relative"]
             p = Popen(['rsync'] + args, shell=False)
             print p.wait()
             table.delete(filepath=filed['filepath'])
