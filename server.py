@@ -2,7 +2,7 @@ from __future__ import print_function
 import dataset
 import json
 import sys
-from flask import Flask,jsonify
+from flask import Flask,jsonify,request
 
 
 app = Flask(__name__)
@@ -22,7 +22,7 @@ def track_files():
             table.delete(filepath = val['filepath'])
         table.insert(val)
     db.commit()
-    return jsonify("Added")
+    return "Added"
 
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
