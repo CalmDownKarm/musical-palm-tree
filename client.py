@@ -131,7 +131,7 @@ def push(force):
             json_data = json.load(filed)
             click.echo(json_data)
         try:    
-            r = requests.put(serverurl,json=json_data,headers={'Content-Type': 'application/json'})
+            r = requests.get(serverurl,json=json_data,headers={'Content-Type': 'application/json'})
         except Exception as e:
             print e
     else:

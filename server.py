@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function   
 import dataset
 import json
 import sys
@@ -11,7 +11,7 @@ app = Flask(__name__)
 def hello():
     return "<h1 style='color:blue'>Hello There!</h1>"
 
-@app.route('/v1/sendfilelist', methods=['POST'])
+@app.route('/v1/sendfilelist', methods=['GET'])
 def track_files():
     content = request.get_json(silent=False)
     print(content, file=sys.stderr)
