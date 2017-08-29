@@ -25,7 +25,8 @@ def track_files():
     db.commit()
     return "Added"
 
-def delfiles(filep,db):
+def delfiles(filep):
+    db = dataset.connect('sqlite:///serverdb.db')
     table = db['files']
     if not table.find_one(filepath=filep):
         print(filep, file=sys.stderr)
@@ -36,7 +37,7 @@ def returntablecontents():
     db = dataset.connect('sqlite:///serverdb.db')
     all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk("/home/karm/datafiles") for f in filenames]       
     # Clean  files from dataframe incase user pushes fewer files.
-    [delfiles(fp,db) for fp in all_files] 
+    map(delfiles,all_files) 
     data = [x for x in db['files']]
     # This JSON is for easy debugging
     result = db['files'].all()
