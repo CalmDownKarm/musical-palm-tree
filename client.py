@@ -81,12 +81,9 @@ def pull():
         args = ["-avz","karm@139.59.90.147:/home/karm/datafiles/","."]
         p = Popen(['rsync'] + args, shell=False)
         print p.wait()
+        table.delete()
         for filed in filedata:
-            f = filed['filepath']
-            click.echo(f)
-            if(table.find_one(f)):
-                table.delete(filepath=f)
-            table.insert(create_dict(f))
+            table.insert(create_dict(filed['filepath']))
         db.commit()
     except Exception as e:
         print e
