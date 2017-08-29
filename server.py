@@ -28,6 +28,7 @@ def track_files():
 def delfiles(filep,db):
     table = db['files']
     if not table.find_one(filepath=filep):
+        print(content, file=sys.stderr)
         os.remove(filep)
 
 @app.route('/v1/replytopull',methods = ['GET'])

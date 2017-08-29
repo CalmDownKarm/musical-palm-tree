@@ -78,7 +78,7 @@ def pull():
     try:
         r = requests.get(serverurl)
         filedata = r.json()
-        args = ["-avz","karm@139.59.90.147:/home/karm/datafiles/","Data/"]
+        args = ["-avz","karm@139.59.90.147:/home/karm/datafiles/","."]
         p = Popen(['rsync'] + args, shell=False)
         print p.wait()
         for filed in filedata:
