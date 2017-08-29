@@ -36,7 +36,6 @@ def create_dict(filename):
 
 def add_file_to_tracked(filename):
     """ Helper function to add files to the sqlite db """
-    # TODO MAKE THS RECURSIVE
     db = dataset.connect('sqlite:///mydatabase.db')
     table = db['files']
     check = table.find_one(filepath=filename)
@@ -59,7 +58,6 @@ def add_file_to_tracked(filename):
 def add(filepath,isdirectory):
     """Point a file, it should be tracked. Point to a directory with the id flag and all files in the directory get added"""
     if isdirectory:
-        # onlyfiles = [join(filepath, f) for f in os.listdir(filepath) if isfile(join(filepath, f))]
         result = [os.path.join(dp, f) for dp, dn, filenames in os.walk(filepath) for f in filenames]
         click.echo(result)
         map(add_file_to_tracked,result)
@@ -112,10 +110,10 @@ def check_if_changed(filed):
 def push(force): 
     serverurl = "http://139.59.90.147:5000/v1/sendfilelist"
     """ Sync your local directory with server will always overwrite server"""
-    #1. check local head and see if there are any changes
-    #2. if yes, update filetable
-    #3  use rsync to transfer files themselves.
-    #4. Transmit updated filetable 
+    # 1. check local head and see if there are any changes
+    # 2. if yes, update filetable
+    # 3  Transmit updated filetable 
+    # 4 use rsync to transfer files themselves. 
     db = dataset.connect('sqlite:///mydatabase.db')
     table = db['files']
     flag = False #Boolean flag to check if a push even needs to occur
