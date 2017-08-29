@@ -84,8 +84,9 @@ def pull():
         for filed in filedata:
             f = filed['filepath']
             click.echo(f)
-            table.delete(filepath=filed['filepath'])
-            table.insert(create_dict(filed['filepath']))
+            if(table.find_one(f)):
+                table.delete(filepath=f)
+            table.insert(create_dict(f))
         db.commit()
     except Exception as e:
         print e
@@ -132,11 +133,6 @@ def push(force):
             flag = True
     db.commit()
     if flag or force:
-        for filed in db['files']:
-            f = filed['filepath']
-            args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/","--relative"]
-            p = Popen(['rsync'] + args, shell=False)
-            print p.wait()
         result = db['files'].all()
         dataset.freeze(result, format='json', filename='files.json')
         with open("files.json","rb") as filed:
@@ -146,6 +142,11 @@ def push(force):
             r = requests.get(serverurl,json=json_data,headers={'Content-Type': 'application/json'})
         except Exception as e:
             print e
+        for filed in db['files']:
+            f = filed['filepath']
+            args = ["-avz",f,"karm@139.59.90.147:/home/karm/datafiles/","--relative"]
+            p = Popen(['rsync'] + args, shell=False)
+            print p.wait()
     else:
         click.echo("No files have been changed to push")
     
