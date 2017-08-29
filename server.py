@@ -33,7 +33,7 @@ def delfiles(filep,db):
 @app.route('/v1/replytopull',methods = ['GET'])
 def returntablecontents():
     db = dataset.connect('sqlite:///serverdb.db')
-    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk(filepath) for f in filenames]       
+    all_files = [os.path.join(dp, f) for dp, dn, filenames in os.walk("/home/karm/datafiles") for f in filenames]       
     # Clean  files from dataframe incase user pushes fewer files.
     [delfiles(fp,db) for fp in all_files] 
     data = [x for x in db['files']]
