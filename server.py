@@ -37,8 +37,10 @@ def returntablecontents():
     # Clean  files from dataframe incase user pushes fewer files.
     [delfiles(fp,db) for fp in all_files] 
     data = [x for x in db['files']]
+    # This JSON is for easy debugging
     result = db['files'].all()
     dataset.freeze(result,format='json',filename='files.json')
+    
     return jsonify(data)
 
 

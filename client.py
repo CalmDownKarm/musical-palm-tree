@@ -94,14 +94,20 @@ def pull():
 def check_if_changed(filed):
     """ Helper to check if file has changed locally """
     filepath = filed['filepath']
-    (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filepath)
-    if mtime != filed['modtime'] or ctime != filed['Ctime'] or size != filed['size']:
-        if calculate_checksum(filepath)!=filed['checksum']:
-            return True
+    # First member of Tuple being True means file exists.
+    # Second Member of Tuple being True means file has changed 
+    if os.path.exists(filepath):
+        (mode, ino, dev, nlink, uid, gid, size, atime, mtime, ctime) = os.stat(filepath)
+        if mtime != filed['modtime'] or ctime != filed['Ctime'] or size != filed['size']:
+            if calculate_checksum(filepath)!=filed['checksum']:
+                return (True,True)
+            else:
+                return (True,False)
         else:
-            return False
+            return (True,False)
     else:
-        return False
+        return (False,False)
+        
 
 @click.command()
 @click.option('--force','-f',is_flag=True,help = "Flag if present will force a push",default=False)
@@ -116,9 +122,13 @@ def push(force):
     table = db['files']
     flag = False #Boolean flag to check if a push even needs to occur
     for filed in db['files']:
-        if check_if_changed(filed) or force:
+        if check_if_changed(filed) == (True,True) or force:
             table.delete(filepath=filed['filepath'])
             table.insert(create_dict(filed['filepath']))
+            flag = True
+        elif check_if_changed(filed) == (False,False):
+            # File has been deleted locally
+            table.delete(filepath=filed['filepath'])
             flag = True
     db.commit()
     if flag or force:
