@@ -1,4 +1,4 @@
-# BackEnd task for socialcops
+# BackEnd task
 Written in python, uses Click, Dataset libraries for the client and flask for the server. 
 The file lists are stored using a SQLite database and rsync is used via a subsystem call (Python's Popen()) in order to actually transfer files. 
 Currently, this is rather insecure, as anyone with the client can push and pull data from the server. However, authentication can be added in two ways - 
